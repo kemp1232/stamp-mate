@@ -70,7 +70,15 @@ export function ScannerPanel() {
         },
       )
       .then(() => {
-        if (!cancelled) setState("scanning");
+        if (cancelled) {
+          // Unmounted while start() was still pending — the cleanup below
+          // already ran and saw a not-yet-SCANNING state, so it skipped
+          // stop(). Now that start() has actually turned the camera on,
+          // stop it ourselves or the stream leaks past navigation.
+          safeStop(scanner).finally(() => scanner.clear());
+          return;
+        }
+        setState("scanning");
       })
       .catch((err: unknown) => {
         if (cancelled) return;

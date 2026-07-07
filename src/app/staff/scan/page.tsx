@@ -2,7 +2,7 @@ import { ScannerPanel } from "@/components/scanner-panel";
 
 export default function StaffScanPage() {
   return (
-    <div className="mx-auto flex max-w-sm flex-col gap-4 p-4">
+    <div className="mx-auto flex max-w-sm flex-col gap-4 p-4 animate-in fade-in duration-200">
       <div>
         <h1 className="text-xl font-semibold">Scan customer QR</h1>
         <p className="text-sm text-muted-foreground">

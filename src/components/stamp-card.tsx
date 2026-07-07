@@ -1,10 +1,3 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { StampGrid } from "@/components/stamp-grid";
 import type { LoyaltyCardStatus } from "@/generated/prisma/enums";
 
@@ -26,12 +19,20 @@ export function StampCard({
   status: LoyaltyCardStatus;
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardDescription>{storeName}</CardDescription>
-        <CardTitle>{programName}</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+    <div className="overflow-hidden rounded-3xl bg-card shadow-xl ring-1 ring-foreground/10">
+      <div className="bg-gradient-to-br from-primary to-primary/70 px-6 py-5 text-primary-foreground">
+        <p className="text-xs font-medium tracking-wide uppercase opacity-80">
+          {storeName}
+        </p>
+        <p className="text-xl font-semibold">{programName}</p>
+      </div>
+
+      <div className="relative border-t-2 border-dashed border-foreground/15">
+        <div className="absolute top-1/2 -left-3 size-6 -translate-y-1/2 rounded-full bg-background" />
+        <div className="absolute top-1/2 -right-3 size-6 -translate-y-1/2 rounded-full bg-background" />
+      </div>
+
+      <div className="flex flex-col gap-4 p-6">
         <p className="text-sm text-muted-foreground">Hi {customerName}!</p>
 
         {status === "COMPLETED" ? (
@@ -58,11 +59,11 @@ export function StampCard({
           </>
         )}
 
-        <div className="rounded-lg border p-3 text-center">
+        <div className="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-3 text-center">
           <p className="text-sm text-muted-foreground">Reward</p>
           <p className="text-lg font-medium">{rewardText}</p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

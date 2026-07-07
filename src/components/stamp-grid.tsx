@@ -15,9 +15,9 @@ export function StampGrid({
           <div
             key={index}
             className={cn(
-              "flex aspect-square items-center justify-center rounded-full border-2 text-sm font-medium",
+              "flex aspect-square items-center justify-center rounded-full border-2 text-sm font-medium transition-colors",
               filled
-                ? "border-primary bg-primary text-primary-foreground"
+                ? "border-primary bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-sm"
                 : "border-dashed border-muted-foreground/40 text-muted-foreground",
             )}
           >

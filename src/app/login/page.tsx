@@ -6,6 +6,7 @@ import { loginWithPassword } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Logo } from "@/components/logo";
 import {
   Card,
   CardContent,
@@ -18,7 +19,8 @@ export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginWithPassword, {});
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-4 animate-in fade-in duration-200">
+      <Logo className="h-10 w-auto" />
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Log in</CardTitle>

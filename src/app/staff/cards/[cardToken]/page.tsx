@@ -1,9 +1,12 @@
+import Link from "next/link";
 import { getStaffCardByToken } from "@/lib/loyalty-card";
 import { requireBusinessAccess } from "@/lib/authorization";
+import { StaffRole } from "@/generated/prisma/enums";
 import { ErrorState } from "@/components/error-state";
 import { CustomerSummaryCard } from "@/components/customer-summary-card";
 import { StampControls } from "@/components/stamp-controls";
 import { RedeemRewardButton } from "@/components/redeem-reward-button";
+import { Button } from "@/components/ui/button";
 
 export default async function StaffCardPage({
   params,
@@ -29,7 +32,8 @@ export default async function StaffCardPage({
     );
   }
 
-  await requireBusinessAccess(card.businessId);
+  const { membership } = await requireBusinessAccess(card.businessId);
+  const isOwner = membership.role === StaffRole.OWNER;
 
   // These only drive button disabled/visible state for UX —
   // addStamp/undoLastStamp/redeemReward independently re-validate all of
@@ -43,7 +47,18 @@ export default async function StaffCardPage({
     card.status !== "CANCELLED";
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 p-6">
+    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 p-6 animate-in fade-in duration-200">
+      {isOwner ? (
+        <Button
+          variant="outline"
+          size="sm"
+          className="self-start"
+          nativeButton={false}
+          render={<Link href="/dashboard" />}
+        >
+          ← Back to dashboard
+        </Button>
+      ) : null}
       {redeemed ? (
         <p className="rounded-lg bg-emerald-50 p-3 text-center text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
           🎉 Reward redeemed! This is the customer&apos;s new active card.

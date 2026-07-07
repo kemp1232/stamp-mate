@@ -19,12 +19,10 @@ export default async function StatsPage() {
   );
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6 animate-in fade-in duration-300">
       <div>
         <h1 className="text-2xl font-semibold">Activity</h1>
-        <p className="text-muted-foreground">
-          Recent stamps and redemptions.
-        </p>
+        <p className="text-muted-foreground">Recent stamps and redemptions.</p>
       </div>
 
       <Card>
@@ -39,8 +37,7 @@ export default async function StatsPage() {
               {recentStamps.map((stamp) => (
                 <li key={stamp.id} className="text-sm text-muted-foreground">
                   +1 stamp for {stamp.loyaltyCard.customer.name} by{" "}
-                  {stamp.staffUser.name} ·{" "}
-                  {formatActivityTime(stamp.createdAt)}
+                  {stamp.staffUser.name} · {formatActivityTime(stamp.createdAt)}
                 </li>
               ))}
             </ul>

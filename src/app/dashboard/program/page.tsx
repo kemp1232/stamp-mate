@@ -22,7 +22,7 @@ export default async function ProgramPage() {
   const joinUrl = `${getAppUrl()}/join/${store.slug}`;
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-6 p-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6 animate-in fade-in duration-200">
       <div>
         <h1 className="text-2xl font-semibold">Loyalty program</h1>
         <p className="text-muted-foreground">{store.name}</p>

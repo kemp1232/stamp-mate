@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getStaffMembershipsForUser, requireUser } from "@/lib/authorization";
 import { getDashboardStats } from "@/lib/dashboard";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { StatCard } from "@/components/stat-card";
 
 export default async function DashboardPage() {
@@ -16,7 +17,7 @@ export default async function DashboardPage() {
     : null;
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6 animate-in fade-in duration-300">
       <div>
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-muted-foreground">Signed in as {user.email}</p>
@@ -52,47 +53,58 @@ export default async function DashboardPage() {
         </>
       ) : null}
 
-      <div className="rounded-lg border p-4">
-        <h2 className="mb-2 font-medium">Staff tools</h2>
-        <p className="mb-3 text-sm text-muted-foreground">
-          Scan a customer&apos;s QR code to add stamps or redeem rewards.
-        </p>
-        <Button nativeButton={false} render={<Link href="/staff" />}>
-          Go to staff area
-        </Button>
-      </div>
-
-      <div className="rounded-lg border p-4">
-        <h2 className="mb-2 font-medium">Your businesses</h2>
-        {memberships.length === 0 ? (
+      <Card>
+        <CardContent className="flex flex-col gap-3">
+          <CardTitle>Staff tools</CardTitle>
           <p className="text-sm text-muted-foreground">
-            No business memberships yet.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {memberships.map((membership) => (
-              <li key={membership.id} className="text-sm">
-                {membership.business.name} —{" "}
-                <span className="font-medium">{membership.role}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {ownerMembership ? (
-        <div className="rounded-lg border p-4">
-          <h2 className="mb-2 font-medium">Loyalty program</h2>
-          <p className="mb-3 text-sm text-muted-foreground">
-            Set up the stamps and reward customers will see when they join.
+            Scan a customer&apos;s QR code to add stamps or redeem rewards.
           </p>
           <Button
             nativeButton={false}
-            render={<Link href="/dashboard/program" />}
+            render={<Link href="/staff" />}
+            className="self-start"
           >
-            Manage program
+            Go to staff area
           </Button>
-        </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="flex flex-col gap-3">
+          <CardTitle>Your businesses</CardTitle>
+          {memberships.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No business memberships yet.
+            </p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {memberships.map((membership) => (
+                <li key={membership.id} className="text-sm">
+                  {membership.business.name} —{" "}
+                  <span className="font-medium">{membership.role}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      {ownerMembership ? (
+        <Card>
+          <CardContent className="flex flex-col gap-3">
+            <CardTitle>Loyalty program</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Set up the stamps and reward customers will see when they join.
+            </p>
+            <Button
+              nativeButton={false}
+              render={<Link href="/dashboard/program" />}
+              className="self-start"
+            >
+              Manage program
+            </Button>
+          </CardContent>
+        </Card>
       ) : null}
     </div>
   );
