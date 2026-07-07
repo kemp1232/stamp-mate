@@ -1,0 +1,242 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  staffMemberships StaffMembership[]
+  stampsGiven      Stamp[]
+  redemptionsGiven RewardRedemption[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+enum StaffRole {
+  OWNER
+  STAFF
+}
+
+model Business {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  staff     StaffMembership[]
+  stores    Store[]
+  customers Customer[]
+
+  @@map("business")
+}
+
+// Connects a user to a business with a role. Scoped to the business only for
+// now; a storeId can be added once staff need per-store assignment.
+model StaffMembership {
+  id         String    @id @default(uuid())
+  role       StaffRole
+  userId     String
+  businessId String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([userId])
+  @@index([businessId])
+  @@index([role])
+  @@map("staff_membership")
+}
+
+// For MVP, a business has exactly one store, created lazily the first time
+// the owner sets up a loyalty program. The slug will back the public
+// /join/[storeSlug] route in Milestone 4.
+model Store {
+  id         String   @id @default(uuid())
+  businessId String
+  name       String
+  slug       String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business        Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  loyaltyPrograms LoyaltyProgram[]
+
+  @@index([businessId])
+  @@map("store")
+}
+
+enum LoyaltyProgramStatus {
+  ACTIVE
+  INACTIVE
+}
+
+// For MVP, a store has at most one loyalty program at a time, so this is
+// the only ACTIVE/INACTIVE row for its store rather than a full history.
+model LoyaltyProgram {
+  id             String               @id @default(uuid())
+  storeId        String
+  name           String
+  requiredStamps Int
+  rewardText     String
+  status         LoyaltyProgramStatus @default(ACTIVE)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  store        Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  loyaltyCards LoyaltyCard[]
+
+  @@index([storeId])
+  @@index([status])
+  @@map("loyalty_program")
+}
+
+// A customer joins without a password account; phone is how they're found
+// again within the same business (e.g. re-scanning a join QR).
+model Customer {
+  id         String   @id @default(uuid())
+  businessId String
+  name       String
+  phone      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  loyaltyCards LoyaltyCard[]
+
+  @@unique([businessId, phone])
+  @@index([businessId])
+  @@map("customer")
+}
+
+enum LoyaltyCardStatus {
+  ACTIVE
+  COMPLETED
+  REDEEMED
+  CANCELLED
+}
+
+// A customer gets a new LoyaltyCard row per cycle (Milestone 8 creates the
+// next one after redemption), so history isn't overwritten. The unique
+// constraint here only covers the columns Prisma can express — the
+// "only one ACTIVE card per customer+program" rule is enforced by a partial
+// unique index added directly in the migration SQL (see migration notes).
+model LoyaltyCard {
+  id               String            @id @default(uuid())
+  customerId       String
+  loyaltyProgramId String
+  cardToken        String            @unique
+  status           LoyaltyCardStatus @default(ACTIVE)
+  cycleNumber      Int               @default(1)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  customer       Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  loyaltyProgram LoyaltyProgram    @relation(fields: [loyaltyProgramId], references: [id], onDelete: Cascade)
+  stamps         Stamp[]
+  redemption     RewardRedemption?
+
+  @@index([customerId])
+  @@index([loyaltyProgramId])
+  @@map("loyalty_card")
+}
+
+// One row per stamp given, so undo always targets a specific row and the
+// staff member who gave each stamp is preserved for the audit trail.
+model Stamp {
+  id            String   @id @default(uuid())
+  loyaltyCardId String
+  staffUserId   String
+  createdAt     DateTime @default(now())
+
+  loyaltyCard LoyaltyCard @relation(fields: [loyaltyCardId], references: [id], onDelete: Cascade)
+  staffUser   User        @relation(fields: [staffUserId], references: [id], onDelete: Restrict)
+
+  @@index([loyaltyCardId])
+  @@index([staffUserId])
+  @@map("stamp")
+}
+
+// One-to-one with LoyaltyCard (via the unique loyaltyCardId) so a completed
+// card can only ever be redeemed once, even under a concurrent double-tap.
+model RewardRedemption {
+  id            String   @id @default(uuid())
+  loyaltyCardId String   @unique
+  staffUserId   String
+  createdAt     DateTime @default(now())
+
+  loyaltyCard LoyaltyCard @relation(fields: [loyaltyCardId], references: [id], onDelete: Cascade)
+  staffUser   User        @relation(fields: [staffUserId], references: [id], onDelete: Restrict)
+
+  @@index([staffUserId])
+  @@map("reward_redemption")
+}
