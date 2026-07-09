@@ -33,6 +33,7 @@ export async function registerOwner(
     });
     userId = user.id;
   } catch (err) {
+    throw err;
     console.log("err", err);
     if (err instanceof APIError) {
       return { error: err.message };
