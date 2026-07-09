@@ -33,12 +33,10 @@ export async function registerOwner(
     });
     userId = user.id;
   } catch (err) {
-    throw err;
-    // console.log("err", err);
-    // if (err instanceof APIError) {
-    //   return { error: err.message };
-    // }
-    // return { error: "Could not create account. Please try again." };
+    if (err instanceof APIError) {
+      return { error: err.message };
+    }
+    return { error: "Could not create account. Please try again." };
   }
 
   // A newly registered owner gets their own business and an OWNER
