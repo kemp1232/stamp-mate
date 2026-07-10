@@ -53,7 +53,7 @@ export default async function Image() {
               maxWidth: 620,
             }}
           >
-            Digital loyalty cards for your suki customers.
+            Digital loyalty cards for your loyal customers.
           </div>
 
           <div

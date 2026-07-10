@@ -152,7 +152,7 @@ export default async function Home() {
                 StampMate
               </h1>
               <p className="mt-5 max-w-xl text-2xl font-medium leading-tight sm:text-3xl">
-                Digital loyalty cards for your suki customers.
+                Digital loyalty cards for your loyal customers.
               </p>
               <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
                 Replace paper stamp cards with a simple QR-based loyalty card
