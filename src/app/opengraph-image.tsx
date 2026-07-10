@@ -47,26 +47,32 @@ export default async function Image() {
 
             <div
               style={{
-                marginTop: 28,
-                fontSize: 30,
-                color: "#8A6D4E",
-                maxWidth: 640,
+                marginTop: 26,
+                fontSize: 36,
+                fontWeight: 600,
+                color: "#3B2A1E",
+                maxWidth: 620,
               }}
             >
-              QR-based loyalty cards for small businesses
+              Digital loyalty cards for your suki customers.
             </div>
 
             <div
               style={{
-                marginTop: 18,
-                width: 96,
-                height: 6,
-                borderRadius: 999,
-                background: "#B5842A",
+                marginTop: 16,
+                fontSize: 20,
+                lineHeight: 1.5,
+                color: "#8A6D4E",
+                maxWidth: 600,
               }}
-            />
+            >
+              Replace paper stamp cards with a simple QR-based loyalty card
+              your customers can save on their phone. Customers scan your
+              store QR, join your rewards program, and get their own personal
+              loyalty card.
+            </div>
 
-            <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
+            <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
               {pills.map((pill) => (
                 <div
                   key={pill.label}
