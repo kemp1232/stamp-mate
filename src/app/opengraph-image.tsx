@@ -23,173 +23,175 @@ export default async function Image() {
   ];
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        background: "#F6EFE1",
+        padding: "64px 72px",
+      }}
+    >
       <div
         style={{
-          width: "100%",
-          height: "100%",
           display: "flex",
-          background: "#F6EFE1",
-          padding: "64px 72px",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          flex: 1,
+          height: "100%",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <img src={logoSrc} width={300} height={90} alt="StampMate" />
+
+          <div
+            style={{
+              marginTop: 26,
+              fontSize: 36,
+              fontWeight: 600,
+              color: "#3B2A1E",
+              maxWidth: 620,
+            }}
+          >
+            Digital loyalty cards for your suki customers.
+          </div>
+
+          <div
+            style={{
+              marginTop: 16,
+              fontSize: 20,
+              lineHeight: 1.5,
+              color: "#8A6D4E",
+              maxWidth: 600,
+            }}
+          >
+            Replace paper stamp cards with a simple QR-based loyalty card your
+            customers can save on their phone. Customers scan your store QR,
+            join your rewards program, and get their own personal loyalty card.
+          </div>
+
+          <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
+            {pills.map((pill) => (
+              <div
+                key={pill.label}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "10px 20px",
+                  borderRadius: 999,
+                  background: "#EFE3C8",
+                  fontSize: 22,
+                  color: "#3B2A1E",
+                }}
+              >
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 999,
+                    background: pill.color,
+                  }}
+                />
+                {pill.label}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <span style={{ fontSize: 22, color: "#8A6D4E" }}>Built by</span>
+          <img
+            src={firstMateLogoSrc}
+            width={132}
+            height={27}
+            alt="First Mate Technologies"
+          />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 340,
         }}
       >
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
-            flex: 1,
-            height: "100%",
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <img src={logoSrc} width={300} height={90} alt="StampMate" />
-
-            <div
-              style={{
-                marginTop: 26,
-                fontSize: 36,
-                fontWeight: 600,
-                color: "#3B2A1E",
-                maxWidth: 620,
-              }}
-            >
-              Digital loyalty cards for your suki customers.
-            </div>
-
-            <div
-              style={{
-                marginTop: 16,
-                fontSize: 20,
-                lineHeight: 1.5,
-                color: "#8A6D4E",
-                maxWidth: 600,
-              }}
-            >
-              Replace paper stamp cards with a simple QR-based loyalty card
-              your customers can save on their phone. Customers scan your
-              store QR, join your rewards program, and get their own personal
-              loyalty card.
-            </div>
-
-            <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
-              {pills.map((pill) => (
-                <div
-                  key={pill.label}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "10px 20px",
-                    borderRadius: 999,
-                    background: "#EFE3C8",
-                    fontSize: 22,
-                    color: "#3B2A1E",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: 999,
-                      background: pill.color,
-                    }}
-                  />
-                  {pill.label}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <span style={{ fontSize: 22, color: "#8A6D4E" }}>Built by</span>
-            <img src={firstMateLogoSrc} width={132} height={27} alt="First Mate Technologies" />
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 340,
+            width: 320,
+            borderRadius: 24,
+            background: "#FFFFFF",
+            border: "1px solid #E7D9BC",
+            padding: 32,
+            gap: 18,
           }}
         >
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              width: 320,
-              borderRadius: 24,
-              background: "#FFFFFF",
-              border: "1px solid #E7D9BC",
-              padding: 32,
-              gap: 18,
+              alignSelf: "flex-start",
+              alignItems: "center",
+              gap: 8,
+              padding: "8px 16px",
+              borderRadius: 999,
+              background: "#EFE3C8",
+              fontSize: 18,
+              color: "#3B2A1E",
             }}
           >
             <div
               style={{
-                display: "flex",
-                alignSelf: "flex-start",
-                alignItems: "center",
-                gap: 8,
-                padding: "8px 16px",
+                width: 10,
+                height: 10,
                 borderRadius: 999,
-                background: "#EFE3C8",
-                fontSize: 18,
-                color: "#3B2A1E",
+                background: "#B5842A",
               }}
-            >
-              <div
-                style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: 999,
-                  background: "#B5842A",
-                }}
-              />
-              Stamp card
-            </div>
+            />
+            Stamp card
+          </div>
 
-            <div style={{ fontSize: 20, color: "#8A6D4E" }}>Stamps collected</div>
+          <div style={{ fontSize: 20, color: "#8A6D4E" }}>Stamps collected</div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              fontSize: 56,
+              fontWeight: 700,
+              color: "#3B2A1E",
+            }}
+          >
+            7<span style={{ fontSize: 28, color: "#8A6D4E" }}>/10</span>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              width: "100%",
+              height: 12,
+              borderRadius: 999,
+              background: "#EFE3C8",
+            }}
+          >
             <div
               style={{
-                display: "flex",
-                alignItems: "baseline",
-                fontSize: 56,
-                fontWeight: 700,
-                color: "#3B2A1E",
-              }}
-            >
-              7<span style={{ fontSize: 28, color: "#8A6D4E" }}>/10</span>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                height: 12,
+                width: "70%",
+                height: "100%",
                 borderRadius: 999,
-                background: "#EFE3C8",
+                background: "#B5842A",
               }}
-            >
-              <div
-                style={{
-                  width: "70%",
-                  height: "100%",
-                  borderRadius: 999,
-                  background: "#B5842A",
-                }}
-              />
-            </div>
+            />
+          </div>
 
-            <div style={{ fontSize: 18, color: "#8A6D4E" }}>
-              Reward: 1 free classic milk tea
-            </div>
+          <div style={{ fontSize: 18, color: "#8A6D4E" }}>
+            Reward: 1 free classic milk tea
           </div>
         </div>
       </div>
-    ),
+    </div>,
     size,
   );
 }
