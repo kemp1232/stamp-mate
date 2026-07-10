@@ -182,6 +182,17 @@ export default async function Home() {
                   </Button>
                 ) : null}
               </div>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Built by{" "}
+                <a
+                  href="https://firstmate.tech/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-foreground hover:underline"
+                >
+                  First Mate
+                </a>
+              </p>
             </div>
           </div>
         </div>
@@ -316,17 +327,53 @@ export default async function Home() {
               reward.
             </p>
           </div>
-          <Button
-            size="lg"
-            nativeButton={false}
-            render={<Link href={primaryHref} />}
-            className="h-12 w-full px-5 text-base md:w-auto"
-          >
-            {primaryLabel}
-            <ArrowRight data-icon="inline-end" />
-          </Button>
+          <div className="flex flex-col items-start gap-3 md:items-end">
+            <Button
+              size="lg"
+              nativeButton={false}
+              render={<Link href={primaryHref} />}
+              className="h-12 w-full px-5 text-base md:w-auto"
+            >
+              {primaryLabel}
+              <ArrowRight data-icon="inline-end" />
+            </Button>
+          </div>
         </div>
       </section>
+
+      <footer className="border-t bg-card">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center gap-2">
+            <Logo className="h-7 w-auto" />
+            <span className="text-sm text-muted-foreground">
+              Built by{" "}
+              <a
+                href="https://firstmate.tech/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-foreground hover:underline"
+              >
+                First Mate
+              </a>
+            </span>
+          </div>
+          <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+            QR-based loyalty cards for small businesses, built by{" "}
+            <a
+              href="https://firstmate.tech/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground hover:underline"
+            >
+              First Mate Technologies
+            </a>
+            .
+          </p>
+          <p className="text-xs text-muted-foreground">
+            &copy; {new Date().getFullYear()} StampMate
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }
