@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import {
   createLoyaltyProgram,
   updateLoyaltyProgram,
@@ -43,11 +43,27 @@ export function ProgramForm({
 }) {
   const action = program ? updateLoyaltyProgram : createLoyaltyProgram;
   const [state, formAction, isPending] = useActionState(action, initialState);
+  // Base UI warns if an uncontrolled FieldControl's defaultValue changes
+  // after mount. That happens here on the create→edit transition: this
+  // component doesn't remount (same position in the tree), so `program`
+  // flips from null to a real record on the *same* mounted Input/Select,
+  // and an uncontrolled field's initial defaultValue is fixed at mount.
+  // Controlling every field directly avoids the uncontrolled-defaultValue
+  // path entirely — the `name="..."` attributes below still submit values
+  // with the form via FormData.
+  const [name, setName] = useState(program?.name ?? "");
+  const [requiredStamps, setRequiredStamps] = useState(
+    String(program?.requiredStamps ?? 10),
+  );
+  const [rewardText, setRewardText] = useState(program?.rewardText ?? "");
+  const [status, setStatus] = useState<"ACTIVE" | "INACTIVE">(
+    program?.status ?? "ACTIVE",
+  );
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
+        <CardTitle as="h2">
           {program ? "Edit loyalty program" : "Create your loyalty program"}
         </CardTitle>
         <CardDescription>
@@ -67,7 +83,8 @@ export function ProgramForm({
             <Input
               id="name"
               name="name"
-              defaultValue={program?.name}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Coffee Club"
               required
             />
@@ -80,7 +97,8 @@ export function ProgramForm({
               type="number"
               min={1}
               max={100}
-              defaultValue={program?.requiredStamps ?? 10}
+              value={requiredStamps}
+              onChange={(e) => setRequiredStamps(e.target.value)}
               required
             />
           </div>
@@ -89,14 +107,21 @@ export function ProgramForm({
             <Input
               id="rewardText"
               name="rewardText"
-              defaultValue={program?.rewardText}
+              value={rewardText}
+              onChange={(e) => setRewardText(e.target.value)}
               placeholder="Free coffee"
               required
             />
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="status">Status</Label>
-            <Select name="status" defaultValue={program?.status ?? "ACTIVE"}>
+            <Select
+              name="status"
+              value={status}
+              onValueChange={(value) =>
+                setStatus(value as "ACTIVE" | "INACTIVE")
+              }
+            >
               <SelectTrigger id="status" className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -110,7 +135,7 @@ export function ProgramForm({
             <p className="text-sm text-destructive">{state.error}</p>
           ) : null}
           {state.success ? (
-            <p className="text-sm text-emerald-600 dark:text-emerald-400">
+            <p className="text-sm text-emerald-700 dark:text-emerald-400">
               Saved.
             </p>
           ) : null}

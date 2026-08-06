@@ -5,7 +5,11 @@ import { APIError } from "better-auth";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { StaffRole } from "@/generated/prisma/enums";
-import { loginSchema, registerSchema } from "@/lib/validations/auth";
+import {
+  loginSchema,
+  registerSchema,
+  sanitizeRedirectTarget,
+} from "@/lib/validations/auth";
 
 export type AuthActionState = { error?: string };
 
@@ -33,10 +37,26 @@ export async function registerOwner(
     });
     userId = user.id;
   } catch (err) {
-    if (err instanceof APIError) {
-      return { error: err.message };
-    }
-    return { error: "Could not create account. Please try again." };
+    // The user-facing message is deliberately generic and identical for
+    // every failure mode here (duplicate email, rejected password, internal
+    // error, ...). Better Auth's raw message for a duplicate ("User already
+    // exists.") would let an attacker enumerate registered emails by trying
+    // addresses and watching which one comes back different — so nothing
+    // about `err` (which may echo back the submitted email/PII) is ever
+    // surfaced to the client.
+    //
+    // It must still be logged, though: silently swallowing it makes a DB
+    // outage or Better Auth misconfiguration invisible server-side while
+    // telling the user their own input was wrong. Only a coarse, PHI/PII
+    // free signal is logged — no email, no password, no raw error body.
+    console.error(
+      "registerOwner: signUpEmail failed",
+      err instanceof APIError ? { status: err.status } : "unknown error",
+    );
+    return {
+      error:
+        "Could not create account. Check your details, or log in if you already have an account.",
+    };
   }
 
   // A newly registered owner gets their own business and an OWNER
@@ -54,7 +74,7 @@ export async function registerOwner(
     });
   });
 
-  redirect("/dashboard");
+  redirect(sanitizeRedirectTarget(formData.get("redirectTo")));
 }
 
 export async function loginWithPassword(
@@ -79,5 +99,5 @@ export async function loginWithPassword(
     return { error: "Could not log in. Please try again." };
   }
 
-  redirect("/dashboard");
+  redirect(sanitizeRedirectTarget(formData.get("redirectTo")));
 }

@@ -36,7 +36,7 @@ export default async function ProgramPage() {
       <ProgramForm businessId={membership.businessId} program={program} />
       <Card>
         <CardHeader>
-          <CardTitle>Store join QR code</CardTitle>
+          <CardTitle as="h2">Store join QR code</CardTitle>
           <CardDescription>
             Print or display this so customers can scan it to join.
             {program?.status === "INACTIVE"

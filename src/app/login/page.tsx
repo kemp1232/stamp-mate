@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import { loginWithPassword } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,13 +24,16 @@ export default function LoginPage() {
       <Logo className="h-10 w-auto" />
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Log in</CardTitle>
+          <CardTitle as="h1">Log in</CardTitle>
           <CardDescription>
             Business owners and staff log in here.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form action={formAction} className="flex flex-col gap-4">
+            <Suspense fallback={null}>
+              <RedirectToField />
+            </Suspense>
             <div className="flex flex-col gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -61,4 +65,19 @@ export default function LoginPage() {
       </Card>
     </div>
   );
+}
+
+// Carries the deep link the auth middleware attached (see src/proxy.ts)
+// through the login form so a staff member who got bounced off e.g. a card
+// page lands back there instead of always on /dashboard. The action itself
+// re-validates this (sanitizeRedirectTarget) — it's never trusted as-is.
+// Split out and wrapped in Suspense because useSearchParams() otherwise
+// opts the whole page out of static rendering.
+function RedirectToField() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo");
+  if (!redirectTo) {
+    return null;
+  }
+  return <input type="hidden" name="redirectTo" value={redirectTo} />;
 }

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "S4-001",
+    "title": "Normal name slugifies",
+    "status": "PASS",
+    "detail": "business \"Aroma Coffee QA n-a619e6749b\" -> store.slug=\"aroma-coffee-qa-n-a619e6749b\"",
+    "evidence": ""
+  },
+  {
+    "id": "S4-002",
+    "title": "Name slugifies to empty -> 'store' fallback (+ suffixes)",
+    "status": "PASS",
+    "detail": "slugify-to-empty names -> [{\"name\":\"!!!\",\"slug\":\"store-16\"},{\"name\":\"→→→\",\"slug\":\"store-17\"},{\"name\":\"   \",\"slug\":\"store-18\"},{\"name\":\"___\",\"slug\":\"store-19\"}]",
+    "evidence": ""
+  },
+  {
+    "id": "S4-003",
+    "title": "Unicode-only name -> 'store' fallback",
+    "status": "PASS",
+    "detail": "business \"日本語カフェ\" -> store.slug=\"store-20\" (all chars stripped as non a-z0-9)",
+    "evidence": ""
+  },
+  {
+    "id": "S4-004",
+    "title": "Slug collision suffixing (three businesses named 'Coffee')",
+    "status": "PASS",
+    "detail": "three \"Coffee 1785998638044\" businesses -> slugs: [\"coffee-1785998638044\",\"coffee-1785998638044-2\",\"coffee-1785998638044-3\"] (base=\"coffee-1785998638044\")",
+    "evidence": ""
+  },
+  {
+    "id": "S4-005",
+    "title": "Very long name (300 chars)",
+    "status": "PASS",
+    "detail": "300-char name -> store.slug base length=300, full slug length=302 (suffix=\"-4\"); DB TEXT column accepted it without truncation/error",
+    "evidence": ""
+  },
+  {
+    "id": "S4-006",
+    "title": "Mixed case & punctuation exact slug",
+    "status": "PASS",
+    "detail": "\"  Bob's Café & Bar!!  \" -> store.slug=\"bob-s-caf-bar-4\" (expected base \"bob-s-caf-bar\")",
+    "evidence": ""
+  },
+  {
+    "id": "S4-007",
+    "title": "[SD-7] Slug uniqueness under concurrency",
+    "status": "PASS",
+    "detail": "CONFIRMED SD-7: reproduced in 1/8 attempts — a concurrent getOrCreateDefaultStore pair (two businesses computing the same base slug) hit an UNHANDLED PrismaClientKnownRequestError \"Unique constraint failed on the fields: (`slug`)\" thrown from store.ts's prisma.store.create() call (getOrCreateDefaultStore, store.ts:41). HTTP status stayed 200 (React already began streaming), but the RSC payload embeds \"Switched to client rendering because the server rendering errored\" and the losing business ends up with NO store row at all. Attempts: [{\"statusA\":200,\"statusB\":200,\"storeA\":\"racecafe-n-f8a490aebf\",\"storeB\":\"racecafe-n-f8a490aebf-2\",\"crashInA\":false,\"crashInB\":false},{\"statusA\":200,\"statusB\":200,\"storeA\":\"racecafe-n-6a6d3f069b\",\"storeB\":\"racecafe-n-6a6d3f069b-2\",\"crashInA\":false,\"crashInB\":false},{\"statusA\":200,\"statusB\":200,\"storeA\":\"racecafe-n-ce492517e5\",\"storeB\":null,\"crashInA\":false,\"crashInB\":false},{\"statusA\":200,\"statusB\":200,\"storeA\":\"racecafe-n-980b58c78b\",\"storeB\":\"racecafe-n-980b58c78b-2\",\"crashInA\":false,\"crashInB\":false},{\"statusA\":200,\"statusB\":200,\"storeA\":\"racecafe-n-ae34f2d7e0\",\"storeB\":\"racecafe-n-ae34f2d7e0-2\",\"crashInA\":false,\"crashInB\":false},{\"statusA\":200,\"statusB\":200,\"storeA\":\"racecafe-n-6aa0a9e6d9\",\"storeB\":\"racecafe-n-6aa0a9e6d9-2\",\"crashInA\":false,\"crashInB\":false},{\"statusA\":200,\"statusB\":200,\"storeA\":\"racecafe-n-86bcbffacb\",\"storeB\":\"racecafe-n-86bcbffacb-2\",\"crashInA\":false,\"crashInB\":false},{\"statusA\":200,\"statusB\":200,\"storeA\":\"racecafe-n-c1fbc81bd1\",\"storeB\":\"racecafe-n-c1fbc81bd1-2\",\"crashInA\":false,\"crashInB\":false}]",
+    "evidence": ""
+  },
+  {
+    "id": "S4-008",
+    "title": "Store created lazily only once (sequential calls)",
+    "status": "PASS",
+    "detail": "first call created store id=24927c02-16c8-434a-ae18-97d13ecdd18d slug=once-only-n-fcb1f042b1; second call: still 1 row, same id/slug",
+    "evidence": ""
+  }
+]

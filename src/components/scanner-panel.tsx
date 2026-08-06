@@ -56,7 +56,10 @@ export function ScannerPanel() {
         { fps: 10, qrbox: 240 },
         (decodedText) => {
           if (cancelled) return;
-          const token = extractCardToken(decodedText);
+          const token = extractCardToken(
+            decodedText,
+            window.location.origin,
+          );
           if (!token) {
             setState("invalid");
             return;
@@ -96,7 +99,7 @@ export function ScannerPanel() {
 
   function handleManualSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const token = extractCardToken(manualValue);
+    const token = extractCardToken(manualValue, window.location.origin);
     if (!token) {
       setManualError("Enter a valid card link or token.");
       return;

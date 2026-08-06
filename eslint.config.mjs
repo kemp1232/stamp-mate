@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Acceptance-test harness — needs a running app, a real DB and a browser,
+    // so it is intentionally outside the product's lint/type scope.
+    "qa/scripts/**",
   ]),
 ]);
 

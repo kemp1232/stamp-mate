@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import { registerOwner } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,13 +24,16 @@ export default function RegisterPage() {
       <Logo className="h-10 w-auto" />
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Create your business account</CardTitle>
+          <CardTitle as="h1">Create your business account</CardTitle>
           <CardDescription>
             Register as the owner to set up StampMate for your business.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form action={formAction} className="flex flex-col gap-4">
+            <Suspense fallback={null}>
+              <RedirectToField />
+            </Suspense>
             <div className="flex flex-col gap-2">
               <Label htmlFor="businessName">Business name</Label>
               <Input
@@ -80,4 +84,16 @@ export default function RegisterPage() {
       </Card>
     </div>
   );
+}
+
+// See the matching RedirectToField in src/app/login/page.tsx — same
+// deep-link-preservation purpose for the (less common) case where a
+// logged-out visitor lands on /register with a redirectTo still set.
+function RedirectToField() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo");
+  if (!redirectTo) {
+    return null;
+  }
+  return <input type="hidden" name="redirectTo" value={redirectTo} />;
 }

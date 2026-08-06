@@ -2,7 +2,15 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/*
+ * No manual theme toggle exists (post-MVP). Dark mode simply follows the
+ * user's OS/browser preference, so we don't override Tailwind v4's default
+ * `dark:` variant (which is already `@media (prefers-color-scheme: dark)`).
+ * The block below that redefines the theme tokens uses the same
+ * `@media (prefers-color-scheme: dark)` query directly on `:root`, rather
+ * than a `.dark` class selector, since nothing in the app ever adds that
+ * class.
+ */
 
 @theme inline {
   --color-background: var(--background);
@@ -49,6 +57,7 @@
 }
 
 :root {
+  color-scheme: light dark;
   --background: oklch(0.97 0.025 85);
   --foreground: oklch(0.28 0.045 55);
   --card: oklch(0.995 0.008 85);
@@ -63,7 +72,14 @@
   --muted-foreground: oklch(0.52 0.035 60);
   --accent: oklch(0.93 0.035 80);
   --accent-foreground: oklch(0.3 0.045 55);
-  --destructive: oklch(0.577 0.19 25);
+  /*
+   * Deepened from oklch(0.577 ...) so raw `text-destructive` (the error-message
+   * paragraphs) clears 4.5:1 against --background (was 4.38:1); still clears
+   * --card with margin. The `destructive` button variant derives its own text
+   * color via color-mix() off this token and had large headroom (~7.6:1), so
+   * it stays comfortably above 4.5:1 after this change too.
+   */
+  --destructive: oklch(0.545 0.19 25);
   --border: oklch(0.9 0.025 80);
   --input: oklch(0.9 0.025 80);
   --ring: oklch(0.8 0.11 75);
@@ -83,38 +99,40 @@
   --sidebar-ring: oklch(0.8 0.11 75);
 }
 
-.dark {
-  --background: oklch(0.22 0.02 60);
-  --foreground: oklch(0.95 0.02 85);
-  --card: oklch(0.27 0.02 60);
-  --card-foreground: oklch(0.95 0.02 85);
-  --popover: oklch(0.27 0.02 60);
-  --popover-foreground: oklch(0.95 0.02 85);
-  --primary: oklch(0.8 0.11 75);
-  --primary-foreground: oklch(0.2 0.02 60);
-  --secondary: oklch(0.33 0.025 60);
-  --secondary-foreground: oklch(0.95 0.02 85);
-  --muted: oklch(0.33 0.025 60);
-  --muted-foreground: oklch(0.7 0.025 75);
-  --accent: oklch(0.33 0.025 60);
-  --accent-foreground: oklch(0.95 0.02 85);
-  --destructive: oklch(0.7 0.19 25);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.8 0.11 75);
-  --chart-1: oklch(0.8 0.11 75);
-  --chart-2: oklch(0.65 0.1 60);
-  --chart-3: oklch(0.55 0.08 45);
-  --chart-4: oklch(0.45 0.06 55);
-  --chart-5: oklch(0.35 0.04 60);
-  --sidebar: oklch(0.27 0.02 60);
-  --sidebar-foreground: oklch(0.95 0.02 85);
-  --sidebar-primary: oklch(0.8 0.11 75);
-  --sidebar-primary-foreground: oklch(0.2 0.02 60);
-  --sidebar-accent: oklch(0.33 0.025 60);
-  --sidebar-accent-foreground: oklch(0.95 0.02 85);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.8 0.11 75);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.22 0.02 60);
+    --foreground: oklch(0.95 0.02 85);
+    --card: oklch(0.27 0.02 60);
+    --card-foreground: oklch(0.95 0.02 85);
+    --popover: oklch(0.27 0.02 60);
+    --popover-foreground: oklch(0.95 0.02 85);
+    --primary: oklch(0.8 0.11 75);
+    --primary-foreground: oklch(0.2 0.02 60);
+    --secondary: oklch(0.33 0.025 60);
+    --secondary-foreground: oklch(0.95 0.02 85);
+    --muted: oklch(0.33 0.025 60);
+    --muted-foreground: oklch(0.7 0.025 75);
+    --accent: oklch(0.33 0.025 60);
+    --accent-foreground: oklch(0.95 0.02 85);
+    --destructive: oklch(0.7 0.19 25);
+    --border: oklch(1 0 0 / 12%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.8 0.11 75);
+    --chart-1: oklch(0.8 0.11 75);
+    --chart-2: oklch(0.65 0.1 60);
+    --chart-3: oklch(0.55 0.08 45);
+    --chart-4: oklch(0.45 0.06 55);
+    --chart-5: oklch(0.35 0.04 60);
+    --sidebar: oklch(0.27 0.02 60);
+    --sidebar-foreground: oklch(0.95 0.02 85);
+    --sidebar-primary: oklch(0.8 0.11 75);
+    --sidebar-primary-foreground: oklch(0.2 0.02 60);
+    --sidebar-accent: oklch(0.33 0.025 60);
+    --sidebar-accent-foreground: oklch(0.95 0.02 85);
+    --sidebar-border: oklch(1 0 0 / 12%);
+    --sidebar-ring: oklch(0.8 0.11 75);
+  }
 }
 
 @layer base {
