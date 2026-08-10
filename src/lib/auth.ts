@@ -10,10 +10,16 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  // Cookie cache is deliberately OFF. With it on, a signed session cookie
+  // keeps authenticating for up to `maxAge` after the DB session row is
+  // revoked/expired — e.g. offboarding staff or a stolen-device logout
+  // would still let stamps be added and rewards redeemed for that window.
+  // This app is small-scale enough that the extra per-request DB lookup
+  // (one indexed query) is worth trading away for revocation taking effect
+  // immediately, since staff actions here are security-sensitive.
   session: {
     cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60,
+      enabled: false,
     },
   },
   advanced: {

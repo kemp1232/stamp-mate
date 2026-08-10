@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { requireOwner } from "@/lib/authorization";
 import { getOrCreateDefaultStore } from "@/lib/store";
 import { loyaltyProgramSchema } from "@/lib/validations/loyalty-program";
@@ -37,6 +38,7 @@ export async function createLoyaltyProgram(
 
   const store = await getOrCreateDefaultStore(businessId);
 
+  // Fast, friendly path for the common (non-concurrent) case.
   const existing = await prisma.loyaltyProgram.findFirst({
     where: { storeId: store.id },
   });
@@ -46,9 +48,24 @@ export async function createLoyaltyProgram(
     };
   }
 
-  await prisma.loyaltyProgram.create({
-    data: { ...parsed.data, storeId: store.id },
-  });
+  try {
+    await prisma.loyaltyProgram.create({
+      data: { ...parsed.data, storeId: store.id },
+    });
+  } catch (err) {
+    // The findFirst check above can race with a concurrent create for the
+    // same store; the unique constraint on storeId is the real source of
+    // truth for "one program per store" (M-2).
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === "P2002"
+    ) {
+      return {
+        error: "This store already has a loyalty program. Edit it instead.",
+      };
+    }
+    throw err;
+  }
 
   revalidatePath("/dashboard/program");
   return { success: true };

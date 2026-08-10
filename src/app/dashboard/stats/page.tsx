@@ -27,7 +27,7 @@ export default async function StatsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent stamps</CardTitle>
+          <CardTitle as="h2">Recent stamps</CardTitle>
         </CardHeader>
         <CardContent>
           {recentStamps.length === 0 ? (
@@ -47,7 +47,7 @@ export default async function StatsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent redemptions</CardTitle>
+          <CardTitle as="h2">Recent redemptions</CardTitle>
         </CardHeader>
         <CardContent>
           {recentRedemptions.length === 0 ? (

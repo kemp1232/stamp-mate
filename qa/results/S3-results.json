@@ -1,0 +1,142 @@
+[
+  {
+    "id": "S3-001",
+    "title": "Create program happy path",
+    "status": "PASS",
+    "detail": "DB row id=8e3a1e18-d9b0-4d9b-bc8a-ac4871f5d4cc name/stamps/reward/status correct; store.slug=store-16f45d0ffb; join URL shown on page=true",
+    "evidence": ""
+  },
+  {
+    "id": "S3-002",
+    "title": "Create when one already exists",
+    "status": "PASS",
+    "detail": "raw POST create returned error={\"error\":\"This store already has a loyalty program. Edit it instead.\"}; psql count=1",
+    "evidence": ""
+  },
+  {
+    "id": "S3-003",
+    "title": "requiredStamps boundary: 0",
+    "status": "PASS",
+    "detail": "raw POST requiredStamps=0 -> {\"error\":\"Stamps required must be at least 1\"}; rows written=0",
+    "evidence": ""
+  },
+  {
+    "id": "S3-004",
+    "title": "requiredStamps boundary: 1 (accepted, immediately completes on 1st stamp)",
+    "status": "PASS",
+    "detail": "create accepted requiredStamps=1; after 1 stamp card.status=COMPLETED",
+    "evidence": ""
+  },
+  {
+    "id": "S3-005",
+    "title": "requiredStamps boundary: 100 accepted, 101 rejected",
+    "status": "PASS",
+    "detail": "101 -> {\"error\":\"Stamps required must be 100 or fewer\"}; 100 -> {\"success\":true}; stored=100",
+    "evidence": ""
+  },
+  {
+    "id": "S3-006",
+    "title": "requiredStamps negative (-5, -1)",
+    "status": "PASS",
+    "detail": "-5 -> {\"error\":\"Stamps required must be at least 1\"}; -1 -> {\"error\":\"Stamps required must be at least 1\"}",
+    "evidence": ""
+  },
+  {
+    "id": "S3-007",
+    "title": "requiredStamps non-integer float (5.5)",
+    "status": "PASS",
+    "detail": "5.5 -> {\"error\":\"Stamps required must be a whole number\"}",
+    "evidence": ""
+  },
+  {
+    "id": "S3-008",
+    "title": "requiredStamps non-numeric string (abc)",
+    "status": "PASS",
+    "detail": "\"abc\" -> {\"error\":\"Invalid input: expected number, received NaN\"} (NOTE: actual message is zod's base-type NaN message \"Invalid input: expected number, received NaN\", not the custom \".int()\" whole-number message the plan assumed — see notes)",
+    "evidence": ""
+  },
+  {
+    "id": "S3-009",
+    "title": "requiredStamps empty string",
+    "status": "PASS",
+    "detail": "\"\" -> {\"error\":\"Stamps required must be at least 1\"}",
+    "evidence": ""
+  },
+  {
+    "id": "S3-010",
+    "title": "requiredStamps huge number (999999999999, 1e9)",
+    "status": "PASS",
+    "detail": "999999999999 -> {\"error\":\"Stamps required must be 100 or fewer\"}; 1e9 -> {\"error\":\"Stamps required must be 100 or fewer\"}",
+    "evidence": ""
+  },
+  {
+    "id": "S3-011",
+    "title": "status enum tampering (DELETED / active / empty)",
+    "status": "PASS",
+    "detail": "DELETED -> {\"error\":\"Invalid option: expected one of \\\"ACTIVE\\\"|\\\"INACTIVE\\\"\"}; active -> {\"error\":\"Invalid option: expected one of \\\"ACTIVE\\\"|\\\"INACTIVE\\\"\"}; \"\" -> {\"error\":\"Invalid option: expected one of \\\"ACTIVE\\\"|\\\"INACTIVE\\\"\"}",
+    "evidence": ""
+  },
+  {
+    "id": "S3-012",
+    "title": "name/rewardText 2-char boundary + trim",
+    "status": "PASS",
+    "detail": "name: 'A'->err, ' A '->err, 'AB'->success({\"success\":true}); reward: 'A'->err, ' A '->err, 'AB'->success({\"success\":true})",
+    "evidence": ""
+  },
+  {
+    "id": "S3-013",
+    "title": "Unicode/emoji in name and reward stored+rendered verbatim",
+    "status": "PASS",
+    "detail": "DB stored exactly; /join/store-dbbd0304e2 renders both name and reward verbatim",
+    "evidence": ""
+  },
+  {
+    "id": "S3-014",
+    "title": "XSS payload in name/reward is not executed (escaped on join + card pages)",
+    "status": "PASS",
+    "detail": "create succeeded, stored literally; join/card HTML has no live <script>/<img onerror> tags; no alert() fired; text renders inertly (join snippet includes name text=true)",
+    "evidence": ""
+  },
+  {
+    "id": "S3-015",
+    "title": "Update program happy path",
+    "status": "PASS",
+    "detail": "DB updated: rewardText=\"Free cappuccino\", requiredStamps=6; /join/store-2ffa1a94fa reflects both",
+    "evidence": ""
+  },
+  {
+    "id": "S3-016",
+    "title": "Update missing programId",
+    "status": "PASS",
+    "detail": "raw POST update w/o programId -> {\"error\":\"Missing program.\"}; program row unchanged",
+    "evidence": ""
+  },
+  {
+    "id": "S3-017",
+    "title": "[SD-6] Concurrent create race",
+    "status": "PASS",
+    "detail": "CONFIRMED SD-6: reproduced in 5/5 attempts — up to 2 loyalty_program rows created for a single store when both requests raced past the findFirst existence check. Raw attempts: [{\"r1\":{\"success\":true},\"r2\":{\"success\":true},\"rowCount\":2,\"names\":[\"Race Program A\",\"Race Program B\"]},{\"r1\":{\"success\":true},\"r2\":{\"success\":true},\"rowCount\":2,\"names\":[\"Race Program A\",\"Race Program B\"]},{\"r1\":{\"success\":true},\"r2\":{\"success\":true},\"rowCount\":2,\"names\":[\"Race Program A\",\"Race Program B\"]},{\"r1\":{\"success\":true},\"r2\":{\"success\":true},\"rowCount\":2,\"names\":[\"Race Program A\",\"Race Program B\"]},{\"r1\":{\"success\":true},\"r2\":{\"success\":true},\"rowCount\":2,\"names\":[\"Race Program B\",\"Race Program A\"]}]",
+    "evidence": ""
+  },
+  {
+    "id": "S3-018",
+    "title": "INACTIVE program blocks join (page + action)",
+    "status": "PASS",
+    "detail": "page shows blocked message; raw POST joinLoyaltyProgram -> {\"error\":\"This store isn't accepting new members right now.\"}; customer count unchanged (1->1)",
+    "evidence": ""
+  },
+  {
+    "id": "S3-019",
+    "title": "INACTIVE program: existing ACTIVE card still stampable",
+    "status": "PASS",
+    "detail": "program set INACTIVE; addStamp via UI succeeded; stamp count=1; card status=ACTIVE",
+    "evidence": ""
+  },
+  {
+    "id": "S3-020",
+    "title": "Server-side max=100 enforced even bypassing client constraint (250)",
+    "status": "PASS",
+    "detail": "raw POST requiredStamps=250 (bypassing HTML max=100) -> {\"error\":\"Stamps required must be 100 or fewer\"}; no row written",
+    "evidence": ""
+  }
+]

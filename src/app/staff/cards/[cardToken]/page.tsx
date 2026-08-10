@@ -48,6 +48,10 @@ export default async function StaffCardPage({
 
   return (
     <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 p-6 animate-in fade-in duration-200">
+      {/* CustomerSummaryCard's own title renders as an h2 — this sr-only h1
+          gives the page an accessible landmark without changing the visual
+          layout staff rely on mid-transaction. */}
+      <h1 className="sr-only">{card.customer.name}&apos;s loyalty card</h1>
       {isOwner ? (
         <Button
           variant="outline"

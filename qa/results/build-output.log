@@ -1,0 +1,51 @@
+
+> stamp-mate@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /private/tmp/claude-501/-Users-raymundrafael-Desktop-repos-firstmate-stamp-mate/5aeec2be-dde4-480c-93c3-eef08c7c309f/scratchpad/qa/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /private/tmp/claude-501/-Users-raymundrafael-Desktop-repos-firstmate-stamp-mate/5aeec2be-dde4-480c-93c3-eef08c7c309f/scratchpad/qa/buildcheck/package-lock.json
+
+▲ Next.js 16.2.10 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.9s
+  Running TypeScript ...
+  Finished TypeScript in 1776ms ...
+  Collecting page data using 14 workers ...
+  Generating static pages using 14 workers (0/13) ...
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+  Generating static pages using 14 workers (3/13) 
+  Generating static pages using 14 workers (6/13) 
+  Generating static pages using 14 workers (9/13) 
+✓ Generating static pages using 14 workers (13/13) in 1005ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /api/auth/[...all]
+├ ƒ /card/[cardToken]
+├ ƒ /dashboard
+├ ƒ /dashboard/customers
+├ ƒ /dashboard/program
+├ ƒ /dashboard/stats
+├ ○ /icon.png
+├ ƒ /join/[storeSlug]
+├ ○ /login
+├ ○ /opengraph-image
+├ ○ /register
+├ ƒ /staff
+├ ƒ /staff/cards/[cardToken]
+└ ƒ /staff/scan
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -46,7 +46,7 @@ export function CustomerSummaryCard({
         <CardDescription>
           {storeName} · {programName}
         </CardDescription>
-        <CardTitle>{customerName}</CardTitle>
+        <CardTitle as="h2">{customerName}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="flex items-center justify-between text-sm">

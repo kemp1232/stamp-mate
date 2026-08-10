@@ -65,10 +65,34 @@ export async function getRecentActivity(businessId: string) {
   return { recentStamps, recentRedemptions };
 }
 
-export async function getCustomerList(businessId: string) {
+export const CUSTOMER_LIST_PAGE_SIZE = 25;
+
+/**
+ * Paginated so the query and the rendered list stay bounded as the customer
+ * count grows. `page` is 1-indexed; out-of-range input (too low, too high,
+ * non-finite) is clamped into `[1, totalPages]` below, so callers can pass
+ * raw, unvalidated query-string values straight through.
+ */
+export async function getCustomerList(
+  businessId: string,
+  page: number = 1,
+) {
+  const pageSize = CUSTOMER_LIST_PAGE_SIZE;
+  const requestedPage =
+    Number.isFinite(page) && page >= 1 ? Math.floor(page) : 1;
+
+  // totalCount has to be known before we can clamp the requested page (and
+  // therefore the `skip` offset), so this can't run in Promise.all with the
+  // customers query the way it used to.
+  const totalCount = await prisma.customer.count({ where: { businessId } });
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const safePage = Math.min(requestedPage, totalPages);
+
   const customers = await prisma.customer.findMany({
     where: { businessId },
     orderBy: { createdAt: "desc" },
+    skip: (safePage - 1) * pageSize,
+    take: pageSize,
     select: {
       id: true,
       name: true,
@@ -90,15 +114,21 @@ export async function getCustomerList(businessId: string) {
     },
   });
 
-  return customers.map((customer) => {
-    const card = customer.loyaltyCards[0];
-    return {
-      id: customer.id,
-      name: customer.name,
-      status: card?.status ?? null,
-      currentStamps: card?._count.stamps ?? 0,
-      requiredStamps: card?.loyaltyProgram.requiredStamps ?? 0,
-      lastActivity: card?.stamps[0]?.createdAt ?? card?.createdAt ?? null,
-    };
-  });
+  return {
+    customers: customers.map((customer) => {
+      const card = customer.loyaltyCards[0];
+      return {
+        id: customer.id,
+        name: customer.name,
+        status: card?.status ?? null,
+        currentStamps: card?._count.stamps ?? 0,
+        requiredStamps: card?.loyaltyProgram.requiredStamps ?? 0,
+        lastActivity: card?.stamps[0]?.createdAt ?? card?.createdAt ?? null,
+      };
+    }),
+    totalCount,
+    page: safePage,
+    pageSize,
+    totalPages,
+  };
 }

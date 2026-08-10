@@ -119,10 +119,14 @@ model StaffMembership {
 
 // For MVP, a business has exactly one store, created lazily the first time
 // the owner sets up a loyalty program. The slug will back the public
-// /join/[storeSlug] route in Milestone 4.
+// /join/[storeSlug] route in Milestone 4. businessId is unique to enforce
+// that one-store-per-business rule at the DB level — getOrCreateDefaultStore's
+// findFirst-then-create guard alone only recovers from *slug* collisions,
+// not two concurrent calls for the *same* business racing each other to
+// different (both otherwise-available) slugs (I-2).
 model Store {
   id         String   @id @default(uuid())
-  businessId String
+  businessId String   @unique
   name       String
   slug       String   @unique
   createdAt  DateTime @default(now())
@@ -131,7 +135,6 @@ model Store {
   business        Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
   loyaltyPrograms LoyaltyProgram[]
 
-  @@index([businessId])
   @@map("store")
 }
 
@@ -142,9 +145,12 @@ enum LoyaltyProgramStatus {
 
 // For MVP, a store has at most one loyalty program at a time, so this is
 // the only ACTIVE/INACTIVE row for its store rather than a full history.
+// storeId is unique to enforce that one-program-per-store rule at the DB
+// level — createLoyaltyProgram's findFirst-then-create guard alone races
+// under concurrent submission (M-2).
 model LoyaltyProgram {
   id             String               @id @default(uuid())
-  storeId        String
+  storeId        String               @unique
   name           String
   requiredStamps Int
   rewardText     String
@@ -155,7 +161,6 @@ model LoyaltyProgram {
   store        Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
   loyaltyCards LoyaltyCard[]
 
-  @@index([storeId])
   @@index([status])
   @@map("loyalty_program")
 }

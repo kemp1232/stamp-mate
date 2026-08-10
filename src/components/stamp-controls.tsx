@@ -63,7 +63,7 @@ export function StampControls({
         <p className="text-sm text-destructive">{addState.error}</p>
       ) : null}
       {addState.success ? (
-        <p className="text-sm text-emerald-600 dark:text-emerald-400">
+        <p className="text-sm text-emerald-700 dark:text-emerald-400">
           {addState.success}
         </p>
       ) : null}
@@ -84,7 +84,7 @@ export function StampControls({
         <p className="text-sm text-destructive">{undoState.error}</p>
       ) : null}
       {undoState.success ? (
-        <p className="text-sm text-emerald-600 dark:text-emerald-400">
+        <p className="text-sm text-emerald-700 dark:text-emerald-400">
           {undoState.success}
         </p>
       ) : null}

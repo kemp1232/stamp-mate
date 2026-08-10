@@ -55,7 +55,7 @@ export default async function DashboardPage() {
 
       <Card>
         <CardContent className="flex flex-col gap-3">
-          <CardTitle>Staff tools</CardTitle>
+          <CardTitle as="h2">Staff tools</CardTitle>
           <p className="text-sm text-muted-foreground">
             Scan a customer&apos;s QR code to add stamps or redeem rewards.
           </p>
@@ -71,7 +71,7 @@ export default async function DashboardPage() {
 
       <Card>
         <CardContent className="flex flex-col gap-3">
-          <CardTitle>Your businesses</CardTitle>
+          <CardTitle as="h2">Your businesses</CardTitle>
           {memberships.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               No business memberships yet.
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
       {ownerMembership ? (
         <Card>
           <CardContent className="flex flex-col gap-3">
-            <CardTitle>Loyalty program</CardTitle>
+            <CardTitle as="h2">Loyalty program</CardTitle>
             <p className="text-sm text-muted-foreground">
               Set up the stamps and reward customers will see when they join.
             </p>

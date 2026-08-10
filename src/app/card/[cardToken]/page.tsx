@@ -28,6 +28,12 @@ export default async function CardPage({
 
   return (
     <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 p-6">
+      {/* StampCard is a purely visual component with no native heading — this
+          sr-only h1 gives the page an accessible landmark without changing
+          the printed/screenshot layout customers rely on. */}
+      <h1 className="sr-only">
+        {card.customer.name}&apos;s {card.loyaltyProgram.store.name} stamp card
+      </h1>
       <StampCard
         storeName={card.loyaltyProgram.store.name}
         programName={card.loyaltyProgram.name}
