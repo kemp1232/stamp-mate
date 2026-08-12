@@ -2,7 +2,11 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Html5Qrcode, Html5QrcodeScannerState } from "html5-qrcode";
+import {
+  Html5Qrcode,
+  Html5QrcodeScannerState,
+  Html5QrcodeSupportedFormats,
+} from "html5-qrcode";
 import { extractCardToken } from "@/lib/card-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,12 +52,37 @@ export function ScannerPanel() {
 
   useEffect(() => {
     let cancelled = false;
-    const scanner = new Html5Qrcode(SCANNER_ELEMENT_ID);
+    const scanner = new Html5Qrcode(SCANNER_ELEMENT_ID, {
+      // Restrict the decoder to QR only — every code this app generates is a
+      // QR (customer/staff card links, store join links). Trying every 1D/2D
+      // format each frame is the default and measurably slows detection.
+      formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+      verbose: false,
+    });
 
     scanner
       .start(
         { facingMode: "environment" },
-        { fps: 10, qrbox: 240 },
+        {
+          fps: 10,
+          qrbox: 240,
+          // A plain `{ facingMode: "environment" }` lets the browser pick
+          // its own defaults, which on many phones means a low-res stream
+          // (as small as 640x480) and a camera that doesn't refocus for a
+          // QR held close — both read as "the scanner won't pick it up."
+          // Requesting a higher resolution and continuous autofocus (best
+          // effort; ignored where unsupported) fixes both. This object
+          // fully replaces the constraints derived from the first
+          // argument, so `facingMode` is repeated here.
+          videoConstraints: {
+            facingMode: "environment",
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            advanced: [
+              { focusMode: "continuous" } as MediaTrackConstraintSet,
+            ],
+          },
+        },
         (decodedText) => {
           if (cancelled) return;
           const token = extractCardToken(
