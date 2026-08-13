@@ -15,6 +15,9 @@ const eslintConfig = defineConfig([
     // Acceptance-test harness — needs a running app, a real DB and a browser,
     // so it is intentionally outside the product's lint/type scope.
     "qa/scripts/**",
+    // Self-contained Remotion project (marketing video) with its own
+    // package.json, tsconfig, and `npm run lint` — not part of this app.
+    "motion/**",
   ]),
 ]);
 

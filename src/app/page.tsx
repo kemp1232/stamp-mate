@@ -17,6 +17,7 @@ import {
 import { getCurrentUser } from "@/lib/authorization";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
+import { LoyaltyDemoVideo } from "@/components/loyalty-demo-video";
 
 const steps = [
   {
@@ -259,6 +260,28 @@ export default async function Home() {
               </article>
             );
           })}
+        </div>
+      </section>
+
+      <section className="border-t bg-card">
+        <div className="mx-auto max-w-5xl px-5 py-16 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+              See it in action
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
+              Watch a stamp card fill up in real time.
+            </h2>
+            <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+              This is exactly what customers see after every visit: a stamp
+              lands, the counter climbs, and the reward unlocks automatically at
+              ten.
+            </p>
+          </div>
+
+          <div className="relative mt-9 aspect-video w-full overflow-hidden rounded-2xl">
+            <LoyaltyDemoVideo />
+          </div>
         </div>
       </section>
 

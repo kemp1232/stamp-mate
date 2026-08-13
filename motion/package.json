@@ -1,0 +1,40 @@
+{
+  "name": "motion",
+  "version": "1.0.0",
+  "description": "My Remotion video",
+  "repository": {},
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@remotion/cli": "4.0.509",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.509",
+    "@remotion/tailwind-v4": "4.0.509",
+    "tailwindcss": "4.0.0",
+    "@remotion/google-fonts": "4.0.509",
+    "lucide-react": "1.23.0"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.509",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "9.19.0",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion bundle",
+    "upgrade": "remotion upgrade",
+    "lint": "eslint src && tsc",
+    "render": "npm run render:light && npm run render:dark && npm run poster:light && npm run poster:dark",
+    "render:light": "remotion render src/index.ts StampLoop out/stamp-loop.mp4 --crf=20 --color-space=bt709",
+    "render:dark": "remotion render src/index.ts StampLoopDark out/stamp-loop-dark.mp4 --crf=20 --color-space=bt709",
+    "poster:light": "remotion still src/index.ts StampLoop out/stamp-loop-poster.jpg --frame=8 --image-format=jpeg",
+    "poster:dark": "remotion still src/index.ts StampLoopDark out/stamp-loop-dark-poster.jpg --frame=8 --image-format=jpeg"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
+}
