@@ -1,3 +1,4 @@
+import { Gift, Stamp } from "lucide-react";
 import { requireOwnedBusiness } from "@/lib/authorization";
 import { getRecentActivity } from "@/lib/dashboard";
 import { EmptyState } from "@/components/empty-state";
@@ -27,17 +28,40 @@ export default async function StatsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle as="h2">Recent stamps</CardTitle>
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Stamp className="size-4.5" aria-hidden="true" />
+            </span>
+            <CardTitle as="h2">Recent stamps</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           {recentStamps.length === 0 ? (
-            <EmptyState title="No stamps yet" />
+            <EmptyState icon={Stamp} title="No stamps yet" />
           ) : (
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col divide-y">
               {recentStamps.map((stamp) => (
-                <li key={stamp.id} className="text-sm text-muted-foreground">
-                  +1 stamp for {stamp.loyaltyCard.customer.name} by{" "}
-                  {stamp.staffUser.name} · {formatActivityTime(stamp.createdAt)}
+                <li
+                  key={stamp.id}
+                  className="flex items-start gap-3 py-3 first:pt-0 last:pb-0"
+                >
+                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Stamp className="size-4" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm">
+                      <span className="font-medium">
+                        {stamp.loyaltyCard.customer.name}
+                      </span>{" "}
+                      got a stamp
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      By {stamp.staffUser.name}
+                    </p>
+                  </div>
+                  <p className="shrink-0 text-xs whitespace-nowrap text-muted-foreground">
+                    {formatActivityTime(stamp.createdAt)}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -47,22 +71,43 @@ export default async function StatsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle as="h2">Recent redemptions</CardTitle>
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Gift className="size-4.5" aria-hidden="true" />
+            </span>
+            <CardTitle as="h2">Recent redemptions</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           {recentRedemptions.length === 0 ? (
-            <EmptyState title="No redemptions yet" />
+            <EmptyState icon={Gift} title="No redemptions yet" />
           ) : (
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col divide-y">
               {recentRedemptions.map((redemption) => (
                 <li
                   key={redemption.id}
-                  className="text-sm text-muted-foreground"
+                  className="flex items-start gap-3 py-3 first:pt-0 last:pb-0"
                 >
-                  {redemption.loyaltyCard.customer.name} redeemed{" "}
-                  {redemption.loyaltyCard.loyaltyProgram.rewardText} by{" "}
-                  {redemption.staffUser.name} ·{" "}
-                  {formatActivityTime(redemption.createdAt)}
+                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Gift className="size-4" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm">
+                      <span className="font-medium">
+                        {redemption.loyaltyCard.customer.name}
+                      </span>{" "}
+                      redeemed{" "}
+                      <span className="font-medium">
+                        {redemption.loyaltyCard.loyaltyProgram.rewardText}
+                      </span>
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      By {redemption.staffUser.name}
+                    </p>
+                  </div>
+                  <p className="shrink-0 text-xs whitespace-nowrap text-muted-foreground">
+                    {formatActivityTime(redemption.createdAt)}
+                  </p>
                 </li>
               ))}
             </ul>

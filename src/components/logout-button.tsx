@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +17,7 @@ export function LogoutButton({ size }: { size?: "default" | "sm" }) {
         variant="outline"
         size={size}
         disabled={isPending}
+        className="cursor-pointer"
         onClick={async () => {
           setIsPending(true);
           setError(null);
@@ -36,6 +38,7 @@ export function LogoutButton({ size }: { size?: "default" | "sm" }) {
           router.refresh();
         }}
       >
+        <LogOut data-icon="inline-start" />
         {isPending ? "Logging out..." : "Log out"}
       </Button>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Gift } from "lucide-react";
 import {
   redeemReward,
   type RedeemRewardActionState,
@@ -29,6 +30,7 @@ export function RedeemRewardButton({ cardToken }: { cardToken: string }) {
     >
       <input type="hidden" name="cardToken" value={cardToken} />
       <Button type="submit" size="lg" className="w-full" disabled={isPending}>
+        <Gift data-icon="inline-start" />
         {isPending ? "Redeeming..." : "Redeem Reward"}
       </Button>
       {state.error ? (

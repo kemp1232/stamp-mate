@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { ClipboardList, Save } from "lucide-react";
 import {
   createLoyaltyProgram,
   updateLoyaltyProgram,
@@ -63,9 +64,14 @@ export function ProgramForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle as="h2">
-          {program ? "Edit loyalty program" : "Create your loyalty program"}
-        </CardTitle>
+        <div className="flex items-center gap-2.5">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <ClipboardList className="size-4.5" aria-hidden="true" />
+          </span>
+          <CardTitle as="h2">
+            {program ? "Edit loyalty program" : "Create your loyalty program"}
+          </CardTitle>
+        </div>
         <CardDescription>
           {program
             ? "Update what customers see when they join or check their card."
@@ -140,6 +146,7 @@ export function ProgramForm({
             </p>
           ) : null}
           <Button type="submit" disabled={isPending} className="w-full">
+            <Save data-icon="inline-start" />
             {isPending
               ? "Saving..."
               : program

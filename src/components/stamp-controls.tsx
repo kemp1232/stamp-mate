@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { CheckCircle2, RotateCcw, Stamp } from "lucide-react";
 import {
   addStamp,
   undoLastStamp,
@@ -56,6 +57,7 @@ export function StampControls({
           className="w-full"
           disabled={!canAddStamp || isAdding}
         >
+          <Stamp data-icon="inline-start" />
           {isAdding ? "Adding stamp..." : "Add Stamp"}
         </Button>
       </form>
@@ -63,7 +65,8 @@ export function StampControls({
         <p className="text-sm text-destructive">{addState.error}</p>
       ) : null}
       {addState.success ? (
-        <p className="text-sm text-emerald-700 dark:text-emerald-400">
+        <p className="flex items-center justify-center gap-1.5 text-sm font-medium text-primary">
+          <CheckCircle2 className="size-4" aria-hidden="true" />
           {addState.success}
         </p>
       ) : null}
@@ -77,6 +80,7 @@ export function StampControls({
           className="w-full"
           disabled={!canUndo || isUndoing}
         >
+          <RotateCcw data-icon="inline-start" />
           {isUndoing ? "Undoing..." : "Undo Last Stamp"}
         </Button>
       </form>
@@ -84,7 +88,8 @@ export function StampControls({
         <p className="text-sm text-destructive">{undoState.error}</p>
       ) : null}
       {undoState.success ? (
-        <p className="text-sm text-emerald-700 dark:text-emerald-400">
+        <p className="flex items-center justify-center gap-1.5 text-sm font-medium text-primary">
+          <CheckCircle2 className="size-4" aria-hidden="true" />
           {undoState.success}
         </p>
       ) : null}

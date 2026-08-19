@@ -11,7 +11,9 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen">
       <DashboardNav />
-      {children}
+      {/* Clears the fixed mobile tab bar DashboardNav renders below sm —
+          otherwise the last bit of every page sits underneath it. */}
+      <div className="pb-16 sm:pb-0">{children}</div>
     </div>
   );
 }

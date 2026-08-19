@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import {
   requireUser,
   getStaffMembershipsForUser,
 } from "@/lib/authorization";
 import { Button } from "@/components/ui/button";
+import { ScannerPanel } from "@/components/scanner-panel";
 import { StaffRole } from "@/generated/prisma/enums";
 
 export default async function StaffPage() {
@@ -14,11 +16,14 @@ export default async function StaffPage() {
   );
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6 animate-in fade-in duration-200">
+    <div className="mx-auto flex max-w-sm flex-col gap-6 p-6 animate-in fade-in duration-200">
       <div>
-        <h1 className="text-2xl font-semibold">Staff</h1>
-        <p className="text-muted-foreground">Signed in as {user.email}</p>
+        <h1 className="text-xl font-semibold">Scan customer QR</h1>
+        <p className="text-sm text-muted-foreground">
+          Point the camera at the customer&apos;s personal QR code.
+        </p>
       </div>
+
       {isOwner && (
         <Button
           variant="outline"
@@ -27,20 +32,12 @@ export default async function StaffPage() {
           nativeButton={false}
           render={<Link href="/dashboard" />}
         >
+          <ArrowLeft data-icon="inline-start" />
           Back to dashboard
         </Button>
       )}
-      <Button
-        size="lg"
-        nativeButton={false}
-        render={<Link href="/staff/scan" />}
-      >
-        Scan customer QR
-      </Button>
-      <p className="text-sm text-muted-foreground">
-        Scan a customer&apos;s QR code, or enter their card link manually, to
-        add stamps and redeem rewards.
-      </p>
+
+      <ScannerPanel />
     </div>
   );
 }

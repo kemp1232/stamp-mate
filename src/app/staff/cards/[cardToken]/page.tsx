@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft, PartyPopper, SearchX } from "lucide-react";
 import { getStaffCardByToken } from "@/lib/loyalty-card";
 import { requireBusinessAccess } from "@/lib/authorization";
 import { StaffRole } from "@/generated/prisma/enums";
@@ -26,6 +27,7 @@ export default async function StaffCardPage({
   if (!card) {
     return (
       <ErrorState
+        icon={SearchX}
         title="Card not found"
         description="This link may be incorrect or expired."
       />
@@ -60,12 +62,14 @@ export default async function StaffCardPage({
           nativeButton={false}
           render={<Link href="/dashboard" />}
         >
-          ← Back to dashboard
+          <ArrowLeft data-icon="inline-start" />
+          Back to dashboard
         </Button>
       ) : null}
       {redeemed ? (
-        <p className="rounded-lg bg-emerald-50 p-3 text-center text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-          🎉 Reward redeemed! This is the customer&apos;s new active card.
+        <p className="flex items-center justify-center gap-2 rounded-lg bg-primary/10 p-3 text-center text-sm font-medium text-primary">
+          <PartyPopper className="size-4 shrink-0" aria-hidden="true" />
+          Reward redeemed! This is the customer&apos;s new active card.
         </p>
       ) : null}
       <CustomerSummaryCard

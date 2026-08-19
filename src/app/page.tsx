@@ -108,7 +108,7 @@ export default async function Home() {
 
         <div className="relative mx-auto flex w-full max-w-6xl flex-col px-5 py-5 sm:px-6 lg:px-8">
           <header className="flex items-center justify-between gap-4">
-            <Logo className="h-10 w-auto sm:h-12" />
+            <Logo size="lg" />
             <nav className="flex items-center gap-2">
               {user ? (
                 <Button
@@ -367,7 +367,7 @@ export default async function Home() {
       <footer className="border-t bg-card">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center gap-2">
-            <Logo className="h-7 w-auto" />
+            <Logo size="sm" />
             <span className="text-sm text-muted-foreground">
               Built by{" "}
               <a

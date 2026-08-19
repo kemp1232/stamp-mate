@@ -7,6 +7,7 @@ import {
   Html5QrcodeScannerState,
   Html5QrcodeSupportedFormats,
 } from "html5-qrcode";
+import { ScanLine } from "lucide-react";
 import { extractCardToken } from "@/lib/card-token";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,7 @@ function safeStop(scanner: Html5Qrcode) {
 }
 
 type ScannerState =
+  | "idle"
   | "loading"
   | "scanning"
   | "denied"
@@ -46,11 +48,17 @@ type ScannerState =
 
 export function ScannerPanel() {
   const router = useRouter();
-  const [state, setState] = useState<ScannerState>("loading");
+  // Camera access is a real permission prompt, not something to fire off
+  // the instant this page loads — `hasStarted` only flips once the person
+  // has actually tapped "Start scanning", which is what the effect below
+  // gates on.
+  const [state, setState] = useState<ScannerState>("idle");
+  const [hasStarted, setHasStarted] = useState(false);
   const [manualValue, setManualValue] = useState("");
   const [manualError, setManualError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!hasStarted) return;
     let cancelled = false;
     const scanner = new Html5Qrcode(SCANNER_ELEMENT_ID, {
       // Restrict the decoder to QR only — every code this app generates is a
@@ -124,7 +132,7 @@ export function ScannerPanel() {
       cancelled = true;
       safeStop(scanner).finally(() => scanner.clear());
     };
-  }, [router]);
+  }, [hasStarted, router]);
 
   function handleManualSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -140,6 +148,30 @@ export function ScannerPanel() {
     <div className="flex flex-col gap-4">
       <div className="relative aspect-square w-full overflow-hidden rounded-lg border bg-black">
         <div id={SCANNER_ELEMENT_ID} className="h-full w-full" />
+        {state === "idle" ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/85 p-4 text-center">
+            <span className="flex size-12 items-center justify-center rounded-full bg-white/10 text-white">
+              <ScanLine className="size-6" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-sm font-medium text-white">Ready to scan</p>
+              <p className="mt-1 text-xs text-white/70">
+                We&apos;ll ask for camera access once you start.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              className="cursor-pointer"
+              onClick={() => {
+                setHasStarted(true);
+                setState("loading");
+              }}
+            >
+              <ScanLine data-icon="inline-start" />
+              Start scanning
+            </Button>
+          </div>
+        ) : null}
         {state === "loading" ? (
           <ScannerOverlay>Loading camera...</ScannerOverlay>
         ) : null}

@@ -1,44 +1,20 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { LogoutButton } from "@/components/logout-button";
 import { Logo } from "@/components/logo";
 
-const LINKS = [
-  { href: "/staff", label: "Home" },
-  { href: "/staff/scan", label: "Scan" },
-];
-
+// No nav links here on purpose: /staff *is* the scanner now (see
+// staff/page.tsx), so there's nothing left to switch between — the logo
+// still links back to it, which doubles as "done, scan the next customer"
+// from the card detail page.
 export function StaffNav() {
-  const pathname = usePathname();
-
   return (
-    <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background px-4 py-2">
-      <Link href="/staff" className="shrink-0">
-        <Logo className="h-7 w-auto" />
-      </Link>
-      <nav className="flex min-w-0 gap-1 overflow-x-auto">
-        {LINKS.map((link) => {
-          const isActive = pathname === link.href;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "shrink-0 rounded-full px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              {link.label}
-            </Link>
-          );
-        })}
-      </nav>
-      <LogoutButton size="sm" />
+    <header className="sticky top-0 z-20 border-b bg-background/95 px-4 py-2.5 backdrop-blur-sm sm:px-6">
+      <div className="flex items-center justify-between gap-3">
+        <Link href="/staff" className="shrink-0">
+          <Logo size="sm" />
+        </Link>
+        <LogoutButton size="sm" />
+      </div>
     </header>
   );
 }

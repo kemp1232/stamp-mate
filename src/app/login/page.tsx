@@ -21,7 +21,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-4 animate-in fade-in duration-200">
-      <Logo className="h-10 w-auto" />
+      <Logo size="md" />
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle as="h1">Log in</CardTitle>

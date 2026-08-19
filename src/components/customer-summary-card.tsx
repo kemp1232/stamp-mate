@@ -1,3 +1,4 @@
+import { Gift, Stamp } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -6,14 +7,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { StampGrid } from "@/components/stamp-grid";
+import { LoyaltyStatusBadge } from "@/components/loyalty-status-badge";
 import type { LoyaltyCardStatus } from "@/generated/prisma/enums";
-
-const STATUS_LABEL: Record<LoyaltyCardStatus, string> = {
-  ACTIVE: "Active",
-  COMPLETED: "Ready for reward",
-  REDEEMED: "Redeemed",
-  CANCELLED: "Cancelled",
-};
 
 export type RecentStamp = {
   id: string;
@@ -46,22 +41,25 @@ export function CustomerSummaryCard({
         <CardDescription>
           {storeName} · {programName}
         </CardDescription>
-        <CardTitle as="h2">{customerName}</CardTitle>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle as="h2">{customerName}</CardTitle>
+          <LoyaltyStatusBadge status={status} />
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Status</span>
-          <span className="font-medium">{STATUS_LABEL[status]}</span>
-        </div>
-
         <StampGrid currentStamps={currentStamps} requiredStamps={requiredStamps} />
         <p className="text-center text-sm text-muted-foreground">
           {currentStamps} / {requiredStamps} stamps
         </p>
 
-        <div className="rounded-lg border p-3 text-center">
-          <p className="text-sm text-muted-foreground">Reward</p>
-          <p className="text-lg font-medium">{rewardText}</p>
+        <div className="flex items-center gap-3 rounded-lg border p-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Gift className="size-4.5" aria-hidden="true" />
+          </span>
+          <div>
+            <p className="text-sm text-muted-foreground">Reward</p>
+            <p className="font-medium">{rewardText}</p>
+          </div>
         </div>
 
         <div>
@@ -73,16 +71,22 @@ export function CustomerSummaryCard({
               No stamps recorded yet.
             </p>
           ) : (
-            <ul className="flex flex-col gap-1">
+            <ul className="flex flex-col divide-y">
               {recentStamps.map((stamp) => (
-                <li key={stamp.id} className="text-sm text-muted-foreground">
-                  +1 stamp by {stamp.staffName} ·{" "}
-                  {stamp.createdAt.toLocaleString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
+                <li
+                  key={stamp.id}
+                  className="flex items-center gap-2.5 py-2 first:pt-0 last:pb-0 text-sm text-muted-foreground"
+                >
+                  <Stamp className="size-3.5 shrink-0" aria-hidden="true" />
+                  <span>
+                    +1 stamp by {stamp.staffName} ·{" "}
+                    {stamp.createdAt.toLocaleString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </span>
                 </li>
               ))}
             </ul>
