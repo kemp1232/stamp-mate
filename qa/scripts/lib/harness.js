@@ -4,8 +4,11 @@ import pg from "pg";
 import { chromium } from "playwright";
 import { randomUUID, randomBytes } from "node:crypto";
 
-export const BASE_URL = "http://localhost:3100";
-export const DB_URL = "postgresql://postgres:postgres@127.0.0.1:56322/postgres";
+// Overridable via env so CI (standard Postgres port, app on a fixed port) doesn't
+// need to touch source — local usage is unaffected since both fall back to the
+// values that match `npm run dev -- -p 3100` against a local Supabase instance.
+export const BASE_URL = process.env.QA_BASE_URL ?? "http://localhost:3100";
+export const DB_URL = process.env.QA_DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:56322/postgres";
 
 export const pool = new pg.Pool({ connectionString: DB_URL, max: 8 });
 

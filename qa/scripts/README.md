@@ -3,25 +3,59 @@
 Re-runnable proof for the defects documented in `../QA-REPORT.md`. Committed so the
 findings — especially the concurrency ones — can be reproduced rather than taken on trust.
 
-These are deliberately **not** wired into `package.json`: they need a running app, a real
-database, and a browser, so they're an acceptance harness rather than a unit-test suite.
-Wiring them into CI is a reasonable follow-up but needs a decision on adding `playwright`
-and `pg` as devDependencies.
+`verify-token.mts`, `verify-i6-card-token.mts`, `verify-c1-open-redirect.mts`, and
+`verify-fixes.js` run in CI on every PR (`.github/workflows/qa.yml`, `npm run qa:ci`) —
+see "CI" below. `c2-two-pg-clients.mjs`, `verify-phone-migration.sh`, and `mobile-flow.mjs`
+are not wired in; run them by hand per their notes.
 
-## Setup
+## Setup (local)
 
 ```bash
 # from the repo root, with a database running and migrations applied
-npm i --no-save playwright pg
 npx playwright install chromium
 
-# the scripts expect the app on :3100 and the DB URL below — override in the files if different
+# the scripts default to the app on :3100 and a local-Supabase-shaped DB URL —
+# override both with QA_BASE_URL / QA_DB_URL env vars if yours differ
 npm run dev -- -p 3100
 ```
 
 Defaults: app `http://localhost:3100`, database
 `postgresql://postgres:postgres@127.0.0.1:56322/postgres` (a local Supabase instance).
-Both are constants at the top of `lib/harness.js`.
+Both are constants at the top of `lib/harness.js`, overridable via `QA_BASE_URL` /
+`QA_DB_URL` env vars (added so CI can point them at a plain Postgres service container
+without editing source).
+
+## CI
+
+`.github/workflows/qa.yml` runs two jobs on every PR and push to `main`:
+
+- **checks** — lint, typecheck, `next build` (no DB needed).
+- **qa** — spins up a `postgres:16` service container, runs `prisma migrate deploy`,
+  builds and starts the app on `:3100`, then runs `npm run qa:tokens` (the three `.mts`
+  scripts — pure logic, no DB/browser) followed by `npm run qa:regression`
+  (`verify-fixes.js` — the acceptance harness against the real running app + DB).
+
+`verify-fixes.js` didn't use to fail the process on a FAIL/BLOCKED result — `summary()`
+only prints. It now `process.exit(1)`s if anything didn't PASS, which is what makes it a
+real CI gate instead of an always-green log.
+
+Not run in CI, on purpose:
+
+- **`c2-two-pg-clients.mjs`** — reproduces the undo-vs-redeem race (`H-1` in
+  `QA-REPORT.md`) by hand-orchestrating the exact SQL statements each transaction issues,
+  rather than calling the app. That makes it a step-by-step illustration of the
+  interleaving, not a live check of the current source — it can drift silently if
+  `stamp.ts`/`rewards.ts` change without this file being updated to match. The real
+  concurrency proof against live code is the `H-1` check inside `verify-fixes.js`. Useful
+  for understanding the bug by hand; run it manually.
+- **`verify-phone-migration.sh`** — needs Docker + a specific local Supabase CLI
+  container name and a hardcoded absolute repo path from the original author's machine.
+  Not portable to a generic CI runner as-is.
+- **`mobile-flow.mjs`** — pure evidence capture (screenshots, console errors, network
+  failures) with no pass/fail assertions, and its screenshot output path is also a
+  hardcoded absolute path from the original run. Good for a manual visual pass; would
+  need real assertions (and a fixed output dir) before it belongs in an automated gate —
+  a reasonable next step once visual regression baselines exist.
 
 ## Scripts
 
