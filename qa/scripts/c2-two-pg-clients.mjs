@@ -6,7 +6,9 @@
 import pg from "pg";
 import { randomUUID } from "node:crypto";
 
-const DB_URL = "postgresql://postgres:postgres@127.0.0.1:56322/postgres";
+// Not wired into CI (see qa/scripts/README.md) but kept consistent with
+// lib/harness.js's override so it can still be pointed at a different DB by hand.
+const DB_URL = process.env.QA_DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:56322/postgres";
 
 async function setupCard(pool, { requiredStamps = 3 } = {}) {
   const now = new Date();

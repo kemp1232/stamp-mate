@@ -13,7 +13,11 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "qa:install-browsers": "playwright install --with-deps chromium",
+    "qa:tokens": "tsx qa/scripts/verify-token.mts && tsx qa/scripts/verify-i6-card-token.mts && tsx qa/scripts/verify-c1-open-redirect.mts",
+    "qa:regression": "node qa/scripts/verify-fixes.js",
+    "qa:ci": "npm run qa:tokens && npm run qa:regression"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -43,8 +47,10 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "playwright": "^1.62.1",
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }

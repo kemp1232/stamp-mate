@@ -497,6 +497,14 @@ await test("REG", "Full MVP happy path still works end to end", async () => {
   return `register -> program -> join -> 3 stamps -> COMPLETED -> redeem -> cycle 2 ACTIVE`;
 });
 
-summary();
+const results = summary();
 await browser.close();
 await shutdown();
+
+// summary() only prints — it never fails the process, so without this a CI job
+// running this file would stay green no matter how many checks FAIL/BLOCK.
+const notPassed = results.filter((r) => r.status !== "PASS");
+if (notPassed.length > 0) {
+  console.error(`\n${notPassed.length}/${results.length} check(s) did not pass — failing.`);
+  process.exit(1);
+}

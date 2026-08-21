@@ -1,0 +1,121 @@
+name: QA
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: qa-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Dummy but well-formed — nothing here talks to a real provider.
+  BETTER_AUTH_SECRET: ci-only-secret-not-used-anywhere-real
+
+jobs:
+  # Mirrors qa/TEST-PLAN.md S14-build-health (001/002/003). No DB needed —
+  # the app never queries the database at build time.
+  checks:
+    name: lint, typecheck, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+        env:
+          DATABASE_URL: postgresql://unused:unused@localhost:5432/unused
+          BETTER_AUTH_URL: http://localhost:3100
+
+  # Wires qa/scripts/* (the acceptance harness written for the 2026-08-06 QA
+  # pass, see qa/QA-REPORT.md) into CI so the 22 fixed defects — especially
+  # the concurrency races — can't silently regress. Runs independently of
+  # `checks` for faster feedback; a broken build fails both jobs anyway.
+  #
+  # Deliberately NOT run here (see qa/scripts/README.md):
+  #   - mobile-flow.mjs: pure evidence capture, no pass/fail assertions yet.
+  #   - verify-phone-migration.sh: hardcoded to a local Docker/Supabase CLI
+  #     container name, not portable to a generic Postgres service.
+  qa:
+    name: qa scripts (concurrency + security regressions)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      BETTER_AUTH_URL: http://localhost:3100
+      # Read by qa/scripts/lib/harness.js — see its comment for why these
+      # are overridable instead of the local-Supabase defaults baked in.
+      QA_BASE_URL: http://localhost:3100
+      QA_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run qa:install-browsers
+
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+
+      # Deliberately `next dev`, not a production build+start: the QA scripts were
+      # written and are documented (qa/scripts/README.md) against dev mode. That
+      # matters beyond convenience — Better Auth's sign-up/sign-in rate limiter
+      # defaults to enabled only under NODE_ENV=production, and `next start` trips
+      # it within a couple of test cases (confirmed locally: 10/19 checks failed
+      # with 429s under `next start`, 19/19 passed under `next dev`). `next build`
+      # is still exercised separately in the `checks` job.
+      - name: Start app in background (dev mode)
+        run: |
+          npm run dev -- -p 3100 > /tmp/app.log 2>&1 &
+          echo $! > /tmp/app.pid
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:3100 -o /dev/null; then
+              echo "app is up"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "app never became ready" >&2
+          cat /tmp/app.log
+          exit 1
+
+      # Pure-logic checks (extractCardToken, sanitizeRedirectTarget) — no DB
+      # or running app required, but harmless to run after the app is up.
+      - name: Token / redirect-safety checks
+        run: npm run qa:tokens
+
+      # The acceptance harness: seeds real tenants, drives the real running
+      # app via Playwright + raw fetch replay, and re-attacks each of the 22
+      # findings from qa/QA-REPORT.md (incl. the C-1/H-1/H-4/M-2 races).
+      - name: Regression suite (qa/scripts/verify-fixes.js)
+        run: npm run qa:regression
+
+      - name: Dump app log on failure
+        if: failure()
+        run: cat /tmp/app.log || true
+
+      - name: Stop app
+        if: always()
+        run: kill "$(cat /tmp/app.pid)" 2>/dev/null || true
